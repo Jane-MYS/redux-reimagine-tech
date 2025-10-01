@@ -16,9 +16,9 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // EmailJS Configuration
-  const EMAILJS_SERVICE_ID = 'service_dtqxfea';
-  const EMAILJS_TEMPLATE_ID = 'template_nw7z1dm';
-  const EMAILJS_PUBLIC_KEY = 'EMfMIqzm2ItpvMqoh';
+  const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_dtqxfea';
+  const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_nw7z1dm';
+  const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'EMfMIqzm2ItpvMqoh';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +47,11 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
+      // Check if EmailJS credentials are available
+      if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+        throw new Error('EmailJS configuration is missing');
+      }
+
       // Initialize EmailJS with your public key
       emailjs.init(EMAILJS_PUBLIC_KEY);
 
@@ -73,9 +78,21 @@ const Contact = () => {
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
       console.error('Error sending email:', error);
+      
+      // More specific error messages
+      let errorMessage = "Failed to send message. Please try again or call us directly.";
+      
+      if (error instanceof Error) {
+        if (error.message.includes('configuration')) {
+          errorMessage = "Email service is not configured. Please call us directly at (213) 787-7893.";
+        } else if (error.message.includes('network')) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        }
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to send message. Please try again or call us directly.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
