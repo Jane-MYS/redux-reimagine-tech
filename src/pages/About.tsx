@@ -51,9 +51,17 @@ const About = () => {
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
               Our <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Vision</span>
             </h1>
-            <p className="text-xl md:text-2xl text-foreground/70 leading-relaxed">
-              At Redux Reimagine, we believe technology should be accessible to every business, no matter the size. Whether you're a solo entrepreneur, a growing startup, or an established company, you deserve solutions that empower you, not overwhelm you.
+            <p className="text-lg text-foreground/70 leading-relaxed mb-8">
+              We envision a world where every business, regardless of size or technical expertise, can leverage the full power of modern technology to achieve their goals and grow sustainably.
             </p>
+            <div className="space-y-4 max-w-3xl mx-auto">
+              {promises.map((promise, index) => (
+                <div key={index} className="flex items-start space-x-3">
+                  <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                  <span className="text-foreground/80">{promise}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -63,26 +71,6 @@ const About = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
             <div className="space-y-12">
-              {/* Our Vision */}
-              <div className="animate-fade-up">
-                <div className="flex items-center justify-center mb-6">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center mr-4">
-                    <Globe className="w-6 h-6 text-background" />
-                  </div>
-                  <h2 className="text-3xl md:text-4xl font-bold">Our Vision</h2>
-                </div>
-                <p className="text-lg text-foreground/70 leading-relaxed mb-6 text-center">
-                  We envision a world where every business, regardless of size or technical expertise, can leverage the full power of modern technology to achieve their goals and grow sustainably.
-                </p>
-                <div className="space-y-4 max-w-3xl mx-auto">
-                  {promises.map((promise, index) => (
-                    <div key={index} className="flex items-start space-x-3">
-                      <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-foreground/80">{promise}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
               
               {/* Our Promise */}
               <div className="animate-fade-up" style={{ animationDelay: "0.2s" }}>
