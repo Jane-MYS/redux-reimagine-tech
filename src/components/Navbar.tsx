@@ -43,7 +43,7 @@ const Navbar = () => {
             onClick={() => scrollToSection("home")}
             className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:opacity-80 transition-opacity"
           >
-            Reimagine Tech
+            Redux Reimagine
           </button>
 
           {/* Desktop Navigation */}

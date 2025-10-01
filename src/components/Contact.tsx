@@ -76,7 +76,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <p className="font-semibold mb-1">Email</p>
-                  <p className="text-foreground/70">hello@reimaginetech.com</p>
+                  <p className="text-foreground/70">hello@reduxreimagine.com</p>
                 </div>
               </div>
 

@@ -5,7 +5,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
             <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
-              Reimagine Tech
+              Redux Reimagine
             </h3>
             <p className="text-foreground/60 text-sm">
               Tech solutions reimagined for modern businesses
@@ -29,7 +29,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-8 pt-8 border-t border-border text-center text-sm text-foreground/50">
-          <p>© 2025 Reimagine Tech. All rights reserved.</p>
+          <p>© 2025 Redux Reimagine. All rights reserved.</p>
         </div>
       </div>
     </footer>
