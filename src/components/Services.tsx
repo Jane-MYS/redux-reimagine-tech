@@ -1,27 +1,37 @@
-import { Layers, TrendingUp, Settings, Wifi } from "lucide-react";
+import { Layers, TrendingUp, Settings, Wifi, Sparkles, Wrench } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const Services = () => {
   const services = [
     {
       icon: Layers,
-      title: "Web & App Design",
-      description: "Modern, responsive websites and applications tailored to your brand and goals.",
+      title: "Web & App Development",
+      description: "Modern, responsive websites and custom applications designed to showcase your brand and scale with your business.",
     },
     {
       icon: TrendingUp,
       title: "Project Management Consulting",
-      description: "Streamline how teams deliver results with proven methodologies and tools.",
+      description: "Expert guidance to streamline operations, implement best practices, and drive projects from strategy to successful delivery.",
     },
     {
       icon: Settings,
-      title: "Business Workflow Setup",
-      description: "Implement CRM, cloud storage, and automation tools to optimize operations.",
+      title: "Business Systems Integration & Automation",
+      description: "Design and connect CRMs, cloud platforms, and workflow tools to create seamless, automated business processes that save time and reduce errors.",
     },
     {
       icon: Wifi,
-      title: "Home Network & Tech Support",
-      description: "Secure, reliable home office and network design for remote professionals.",
+      title: "Home Network & Tech Infrastructure",
+      description: "Reliable, secure, and high-performance networks for home offices and personal environments, ensuring smooth connectivity and data safety.",
+    },
+    {
+      icon: Sparkles,
+      title: "AI Integration & Innovation",
+      description: "Harness artificial intelligence to automate repetitive tasks, enhance decision-making, and improve customer experiences through smart tools and solutions.",
+    },
+    {
+      icon: Wrench,
+      title: "Software Solutions & Support",
+      description: "Custom software builds, app integrations, and hands-on support to keep your technology ecosystem efficient and future-ready.",
     },
   ];
 
@@ -39,7 +49,7 @@ const Services = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {services.map((service, index) => (
             <Card
               key={index}
