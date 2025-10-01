@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Phone, MapPin } from "lucide-react";
+import emailjs from '@emailjs/browser';
 
 const Contact = () => {
   const { toast } = useToast();
@@ -12,8 +13,14 @@ const Contact = () => {
     email: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // EmailJS Configuration
+  const EMAILJS_SERVICE_ID = 'service_dtqxfea';
+  const EMAILJS_TEMPLATE_ID = 'template_nw7z1dm';
+  const EMAILJS_PUBLIC_KEY = 'EMfMIqzm2ItpvMqoh';
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
@@ -37,12 +44,43 @@ const Contact = () => {
       return;
     }
 
-    toast({
-      title: "Message Sent!",
-      description: "We'll get back to you within 24 hours.",
-    });
+    setIsSubmitting(true);
 
-    setFormData({ name: "", email: "", message: "" });
+    try {
+      // Initialize EmailJS with your public key
+      emailjs.init(EMAILJS_PUBLIC_KEY);
+
+      // Send email using EmailJS
+      const result = await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          message: formData.message,
+          to_name: "Redux Reimagine Team",
+        }
+      );
+
+      console.log('Email sent successfully:', result);
+      
+      toast({
+        title: "Message Sent!",
+        description: "We'll get back to you within 24 hours.",
+      });
+
+      // Reset form
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      console.error('Error sending email:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again or call us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -71,22 +109,12 @@ const Contact = () => {
 
             <div className="space-y-6">
               <div className="flex items-start gap-4 group">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
-                  <Mail className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <p className="font-semibold mb-1">Email</p>
-                  <p className="text-foreground/70">hello@reduxreimagine.com</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 group">
                 <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-secondary/20 transition-colors">
                   <Phone className="w-6 h-6 text-secondary" />
                 </div>
                 <div>
                   <p className="font-semibold mb-1">Phone</p>
-                  <p className="text-foreground/70">+1 (555) 123-4567</p>
+                  <p className="text-foreground/70">(213) 787-7893</p>
                 </div>
               </div>
 
@@ -149,10 +177,11 @@ const Contact = () => {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-primary to-secondary text-background font-semibold hover:opacity-90 transition-all hover:scale-105 glow-primary"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-primary to-secondary text-background font-semibold hover:opacity-90 transition-all hover:scale-105 glow-primary disabled:opacity-50"
                 size="lg"
               >
-                Send Message
+                {isSubmitting ? "Sending..." : "Send Message"}
               </Button>
             </form>
           </div>

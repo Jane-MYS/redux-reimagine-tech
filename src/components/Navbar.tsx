@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,20 +16,26 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      setIsMobileMenuOpen(false);
+  const handleNavigation = (item: { id: string; href: string }) => {
+    if (item.href === "/" && location.pathname === "/") {
+      // On home page, scroll to section
+      const element = document.getElementById(item.id);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      // Navigate to different page
+      window.location.href = item.href;
     }
+    setIsMobileMenuOpen(false);
   };
 
   const navItems = [
-    { label: "Home", id: "home" },
-    { label: "Services", id: "services" },
-    { label: "Why Us", id: "why-us" },
-    { label: "Case Studies", id: "case-studies" },
-    { label: "Contact", id: "contact" },
+    { label: "Home", id: "home", href: "/" },
+    { label: "About", id: "about", href: "/about" },
+    { label: "Services", id: "services", href: "/" },
+    { label: "Why Us", id: "why-us", href: "/" },
+    { label: "Contact", id: "contact", href: "/" },
   ];
 
   return (
@@ -39,26 +47,26 @@ const Navbar = () => {
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <button
-            onClick={() => scrollToSection("home")}
+          <Link
+            to="/"
             className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hover:opacity-80 transition-opacity"
           >
             Redux Reimagine
-          </button>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => scrollToSection(item.id)}
+                onClick={() => handleNavigation(item)}
                 className="text-foreground/80 hover:text-primary transition-colors font-medium"
               >
                 {item.label}
               </button>
             ))}
             <Button
-              onClick={() => scrollToSection("contact")}
+              onClick={() => handleNavigation({ id: "contact", href: "/" })}
               className="bg-gradient-to-r from-primary to-secondary text-background font-semibold hover:opacity-90 transition-opacity glow-primary"
             >
               Book Consultation
@@ -81,14 +89,14 @@ const Navbar = () => {
               {navItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => scrollToSection(item.id)}
+                  onClick={() => handleNavigation(item)}
                   className="text-foreground/80 hover:text-primary transition-colors font-medium text-left py-2"
                 >
                   {item.label}
                 </button>
               ))}
               <Button
-                onClick={() => scrollToSection("contact")}
+                onClick={() => handleNavigation({ id: "contact", href: "/" })}
                 className="bg-gradient-to-r from-primary to-secondary text-background font-semibold mt-2"
               >
                 Book Consultation
