@@ -64,6 +64,8 @@ const Contact = () => {
           from_email: formData.email,
           message: formData.message,
           to_name: "Redux Reimagine Team",
+          to_email: "contact@reduxreimagine.com", // Add recipient email
+          reply_to: formData.email, // Set reply-to address
         }
       );
 

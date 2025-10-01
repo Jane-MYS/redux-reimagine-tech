@@ -40,19 +40,67 @@ The workflow will automatically run when you push to the main branch and deploy 
 
 The contact form uses EmailJS to send emails. To set up the contact form:
 
-1. **Create an EmailJS account** at [emailjs.com](https://www.emailjs.com/)
-2. **Set up a service** (Gmail, Outlook, etc.)
-3. **Create an email template**
-4. **Get your credentials**:
-   - Service ID
-   - Template ID  
-   - Public Key
+### 1. Create EmailJS Account
+- Go to [emailjs.com](https://www.emailjs.com/) and create an account
+- Verify your email address
 
-5. **Set environment variables** (optional):
-   ```bash
-   VITE_EMAILJS_SERVICE_ID=your_service_id
-   VITE_EMAILJS_TEMPLATE_ID=your_template_id
-   VITE_EMAILJS_PUBLIC_KEY=your_public_key
-   ```
+### 2. Set Up Email Service
+- Go to "Email Services" in your EmailJS dashboard
+- Add a service (Gmail, Outlook, etc.)
+- Follow the setup instructions for your chosen service
+- Note down your **Service ID**
+
+### 3. Create Email Template
+- Go to "Email Templates" in your EmailJS dashboard
+- Click "Create New Template"
+- Use this template content:
+
+**Subject:** New Contact Form Message from {{from_name}}
+
+**Content:**
+```
+Hello {{to_name}},
+
+You have received a new message from your website contact form:
+
+Name: {{from_name}}
+Email: {{from_email}}
+Message: {{message}}
+
+You can reply directly to this email to respond to {{from_name}}.
+
+Best regards,
+Your Website
+```
+
+**Template Variables to include:**
+- `{{from_name}}` - Sender's name
+- `{{from_email}}` - Sender's email
+- `{{message}}` - Message content
+- `{{to_name}}` - Recipient name
+- `{{to_email}}` - Recipient email (set this to your email)
+- `{{reply_to}}` - Reply-to address
+
+**Important:** In the template settings, set:
+- **To Email:** Your email address (e.g., your-email@domain.com)
+- **From Name:** {{from_name}}
+- **Reply To:** {{reply_to}}
+
+### 4. Get Your Credentials
+- **Service ID:** From your email service
+- **Template ID:** From your email template
+- **Public Key:** From your EmailJS account settings
+
+### 5. Set Environment Variables (Optional)
+```bash
+VITE_EMAILJS_SERVICE_ID=your_service_id
+VITE_EMAILJS_TEMPLATE_ID=your_template_id
+VITE_EMAILJS_PUBLIC_KEY=your_public_key
+```
+
+### Common Issues:
+- **"422 The recipients address is empty"**: Make sure your template has a "To Email" set in the template settings
+- **"Invalid template"**: Check that all template variables are properly formatted with double curly braces
+- **"Service not found"**: Verify your Service ID is correct
 
 If environment variables are not set, the form will use default values. Make sure your EmailJS service is properly configured for the contact form to work.
