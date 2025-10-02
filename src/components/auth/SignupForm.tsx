@@ -61,15 +61,15 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
 
   if (success) {
     return (
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-md mx-auto bg-white border-gray-200 shadow-lg">
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
               <Mail className="w-8 h-8 text-green-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">Check your email</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-lg font-semibold text-gray-900">Check your email</h3>
+              <p className="text-gray-600">
                 We've sent you a confirmation link. Please check your email and click the link to verify your account.
               </p>
             </div>
