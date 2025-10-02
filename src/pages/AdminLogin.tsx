@@ -42,7 +42,7 @@ const AdminLogin = () => {
         setError('Invalid email or password.');
       } else {
         // Redirect to admin dashboard
-        navigate('/admin/tickets');
+        navigate('/admin/dashboard');
       }
     } catch (error) {
       console.error('Admin login error:', error);

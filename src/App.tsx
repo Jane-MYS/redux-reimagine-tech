@@ -17,6 +17,9 @@ import Test from "./pages/Test";
 import AdminTickets from "./pages/AdminTickets";
 import AdminLogin from "./pages/AdminLogin";
 import AdminProtectedRoute from "./components/auth/AdminProtectedRoute";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/AdminUsers";
+import AdminInvoices from "./pages/AdminInvoices";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +41,21 @@ const App = () => (
             <Route path="/projects" element={<Projects />} />
             <Route path="/tickets" element={<Tickets />} />
             <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={
+              <AdminProtectedRoute>
+                <AdminDashboard />
+              </AdminProtectedRoute>
+            } />
+            <Route path="/admin/users" element={
+              <AdminProtectedRoute>
+                <AdminUsers />
+              </AdminProtectedRoute>
+            } />
+            <Route path="/admin/invoices" element={
+              <AdminProtectedRoute>
+                <AdminInvoices />
+              </AdminProtectedRoute>
+            } />
             <Route path="/admin/tickets" element={
               <AdminProtectedRoute>
                 <AdminTickets />

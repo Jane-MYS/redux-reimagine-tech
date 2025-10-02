@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -9,293 +9,196 @@ import { Link } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import { supabase } from '@/lib/supabase'
+
+interface Invoice {
+  id: string;
+  client_email: string;
+  invoice_number: string;
+  amount: number;
+  status: 'pending' | 'paid' | 'overdue';
+  due_date: string;
+  file_path: string;
+  created_at: string;
+}
 
 const Invoices: React.FC = () => {
   const { user } = useAuth()
-  const [invoices, setInvoices] = useState([
-    {
-      id: '1',
-      invoiceNumber: 'INV-2024-001',
-      amount: 2500.00,
-      status: 'paid' as const,
-      dueDate: '2024-01-15',
-      issueDate: '2024-01-01',
-      description: 'Website Development - Phase 1'
-    },
-    {
-      id: '2',
-      invoiceNumber: 'INV-2024-002',
-      amount: 1800.00,
-      status: 'sent' as const,
-      dueDate: '2024-02-15',
-      issueDate: '2024-02-01',
-      description: 'Mobile App Development'
-    },
-    {
-      id: '3',
-      invoiceNumber: 'INV-2024-003',
-      amount: 3200.00,
-      status: 'overdue' as const,
-      dueDate: '2024-01-10',
-      issueDate: '2023-12-15',
-      description: 'Database Migration Services'
-    },
-    {
-      id: '4',
-      invoiceNumber: 'INV-2024-004',
-      amount: 950.00,
-      status: 'draft' as const,
-      dueDate: '2024-03-15',
-      issueDate: '2024-02-20',
-      description: 'Maintenance & Support'
-    }
-  ])
-
+  const [invoices, setInvoices] = useState<Invoice[]>([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
+  const [isLoading, setIsLoading] = useState(true)
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'paid':
-        return <div className="w-2 h-2 bg-green-500 rounded-full" />
-      case 'sent':
-        return <div className="w-2 h-2 bg-blue-500 rounded-full" />
-      case 'overdue':
-        return <div className="w-2 h-2 bg-red-500 rounded-full" />
-      case 'draft':
-        return <div className="w-2 h-2 bg-gray-500 rounded-full" />
-      default:
-        return <div className="w-2 h-2 bg-gray-500 rounded-full" />
+  useEffect(() => {
+    fetchInvoices()
+  }, [user])
+
+  const fetchInvoices = async () => {
+    if (!user?.email) return
+
+    try {
+      const { data, error } = await supabase
+        .from('invoices')
+        .select('*')
+        .eq('client_email', user.email)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      setInvoices(data || [])
+    } catch (error) {
+      console.error('Error fetching invoices:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'paid':
-        return 'bg-green-100 text-green-800 border-green-200'
-      case 'sent':
-        return 'bg-blue-100 text-blue-800 border-blue-200'
-      case 'overdue':
-        return 'bg-red-100 text-red-800 border-red-200'
-      case 'draft':
-        return 'bg-gray-100 text-gray-800 border-gray-200'
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+      case 'paid': return 'bg-green-100 text-green-800'
+      case 'overdue': return 'bg-red-100 text-red-800'
+      default: return 'bg-yellow-100 text-yellow-800'
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'paid': return 'Paid'
+      case 'overdue': return 'Overdue'
+      default: return 'Pending'
+    }
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount)
+  const downloadInvoice = async (invoice: Invoice) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('client-uploads')
+        .download(invoice.file_path)
+
+      if (error) throw error
+
+      // Create download link
+      const url = URL.createObjectURL(data)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${invoice.invoice_number}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Error downloading invoice:', error)
+    }
   }
 
-  const filteredInvoices = invoices.filter(invoice => {
-    const matchesSearch = invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         invoice.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === 'all' || invoice.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
-
-  const totalAmount = filteredInvoices.reduce((sum, invoice) => sum + invoice.amount, 0)
+  const filteredInvoices = invoices.filter(invoice =>
+    invoice.invoice_number.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white flex flex-col">
         <Navbar />
         
-        <div className="container mx-auto px-6 pt-24 pb-8">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" asChild className="p-2">
-                <Link to="/dashboard">
-                  <ArrowLeft className="w-4 h-4" />
+        <main className="flex-1 pt-24 pb-8">
+          <div className="container mx-auto px-6">
+            {/* Header */}
+            <div className="mb-8">
+              <div className="flex items-center gap-4 mb-4">
+                <Link 
+                  to="/dashboard" 
+                  className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Dashboard
                 </Link>
-              </Button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Invoices</h1>
-                <p className="text-gray-600">View and download your invoices</p>
               </div>
-            </div>
-            <Button 
-              variant="outline" 
-              asChild
-              className="border-gray-300 text-black bg-white hover:bg-gray-50"
-            >
-              <Link to="/dashboard">Back to Dashboard</Link>
-            </Button>
-          </div>
-
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card className="bg-white border-gray-200 shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Total Invoices</p>
-                    <p className="text-2xl font-bold text-gray-900">{filteredInvoices.length}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border-gray-200 shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Total Amount</p>
-                    <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalAmount)}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border-gray-200 shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <div className="w-6 h-6 bg-green-500 rounded-full" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Paid</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {invoices.filter(inv => inv.status === 'paid').length}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white border-gray-200 shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                    <div className="w-6 h-6 bg-red-500 rounded-full" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Overdue</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {invoices.filter(inv => inv.status === 'overdue').length}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Filters */}
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="Search invoices..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white border-gray-300 text-gray-900"
-              />
-            </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="all">All Status</option>
-              <option value="paid">Paid</option>
-              <option value="sent">Sent</option>
-              <option value="overdue">Overdue</option>
-              <option value="draft">Draft</option>
-            </select>
-          </div>
-
-          {/* Invoices List */}
-          <div className="space-y-4">
-            {filteredInvoices.map((invoice) => (
-              <Card key={invoice.id} className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">{invoice.invoiceNumber}</h3>
-                        <Badge className={`${getStatusColor(invoice.status)} border`}>
-                          <div className="flex items-center space-x-1">
-                            {getStatusIcon(invoice.status)}
-                            <span className="capitalize">{invoice.status}</span>
-                          </div>
-                        </Badge>
-                      </div>
-                      <p className="text-gray-600 mb-3">{invoice.description}</p>
-                      <div className="flex items-center space-x-6 text-sm text-gray-500">
-                        <div className="flex items-center space-x-1">
-                          <DollarSign className="w-4 h-4" />
-                          <span className="font-semibold text-gray-900">{formatCurrency(invoice.amount)}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>Due: {formatDate(invoice.dueDate)}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="w-4 h-4" />
-                          <span>Issued: {formatDate(invoice.issueDate)}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
-                      >
-                        <Eye className="w-4 h-4 mr-1" />
-                        View
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
-                      >
-                        <Download className="w-4 h-4 mr-1" />
-                        Download
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Empty State */}
-          {filteredInvoices.length === 0 && (
-            <div className="text-center py-12">
-              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileText className="w-12 h-12 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No invoices found</h3>
+              
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Invoices</h1>
               <p className="text-gray-600">
-                {searchTerm || statusFilter !== 'all' 
-                  ? 'Try adjusting your search or filter criteria'
-                  : 'No invoices have been generated yet'
-                }
+                View and download your invoices
               </p>
             </div>
-          )}
-        </div>
 
+            {/* Search */}
+            <div className="mb-6">
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search invoices..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            {/* Invoices List */}
+            {isLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading invoices...</p>
+              </div>
+            ) : filteredInvoices.length === 0 ? (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No invoices found</h3>
+                  <p className="text-gray-600">
+                    {searchTerm ? 'No invoices match your search.' : 'You don\'t have any invoices yet.'}
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {filteredInvoices.map((invoice) => (
+                  <Card key={invoice.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              {invoice.invoice_number}
+                            </h3>
+                            <Badge className={getStatusColor(invoice.status)}>
+                              {getStatusText(invoice.status)}
+                            </Badge>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                            <div className="flex items-center gap-2">
+                              <DollarSign className="h-4 w-4" />
+                              <span>${invoice.amount.toFixed(2)}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4" />
+                              <span>Due: {new Date(invoice.due_date).toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4" />
+                              <span>Created: {new Date(invoice.created_at).toLocaleDateString()}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => downloadInvoice(invoice)}
+                            className="flex items-center gap-2"
+                          >
+                            <Download className="h-4 w-4" />
+                            Download
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </main>
+        
         <Footer />
       </div>
     </ProtectedRoute>
