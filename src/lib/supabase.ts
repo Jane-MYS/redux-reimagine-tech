@@ -3,11 +3,15 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
-}
+// Fallback values for development/demo purposes
+const fallbackUrl = 'https://pftfxvxyffqufypmsjen.supabase.co'
+const fallbackKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmdGZ4dnh5ZmZxdWZ5cG1zamVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzNTYxNjcsImV4cCI6MjA3NDkzMjE2N30.T5Pp9lsGzUC1RNOZcVnjxdyNE7PAXl1BN2nxweqgyDQ'
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Use environment variables if available, otherwise use fallback
+const finalUrl = supabaseUrl || fallbackUrl
+const finalKey = supabaseAnonKey || fallbackKey
+
+export const supabase = createClient(finalUrl, finalKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
