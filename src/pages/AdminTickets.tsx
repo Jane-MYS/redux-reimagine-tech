@@ -218,7 +218,7 @@ const AdminTickets: React.FC = () => {
             </div>
 
             <div className="ml-auto">
-              <Button onClick={fetchAllTickets} variant="outline">
+              <Button onClick={fetchAllTickets} className="border-gray-300 text-black bg-white hover:bg-primary hover:text-primary-foreground hover:border-primary">
                 Refresh
               </Button>
             </div>
