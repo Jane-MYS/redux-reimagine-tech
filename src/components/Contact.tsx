@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Phone, MapPin } from "lucide-react";
-import emailjs from '@emailjs/browser';
+import { supabase } from "@/lib/supabase";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -15,10 +15,7 @@ const Contact = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // EmailJS Configuration
-  const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_dtqxfea';
-  const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_nw7z1dm';
-  const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'EMfMIqzm2ItpvMqoh';
+  // Form submission will be handled by Supabase Edge Function
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,29 +44,22 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // Check if EmailJS credentials are available
-      if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
-        throw new Error('EmailJS configuration is missing');
+      // Call Supabase Edge Function to send contact form
+      const { data, error } = await supabase.functions.invoke('send-contact-form', {
+        body: {
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        }
+      });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to send message');
       }
 
-      // Initialize EmailJS with your public key
-      emailjs.init(EMAILJS_PUBLIC_KEY);
-
-      // Send email using EmailJS
-      const result = await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          from_name: formData.name,
-          from_email: formData.email,
-          message: formData.message,
-          to_name: "Redux Reimagine Team",
-          to_email: "contact@reduxreimagine.com", // Add recipient email
-          reply_to: formData.email, // Set reply-to address
-        }
-      );
-
-      console.log('Email sent successfully:', result);
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to send message');
+      }
       
       toast({
         title: "Message Sent!",
@@ -79,16 +69,15 @@ const Contact = () => {
       // Reset form
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
-      console.error('Error sending email:', error);
+      console.error('Error sending message:', error);
       
-      // More specific error messages
-      let errorMessage = "Failed to send message. Please try again or call us directly.";
+      let errorMessage = "Failed to send message. Please try again or call us directly at (213) 787-7893.";
       
       if (error instanceof Error) {
-        if (error.message.includes('configuration')) {
-          errorMessage = "Email service is not configured. Please call us directly at (213) 787-7893.";
-        } else if (error.message.includes('network')) {
+        if (error.message.includes('network') || error.message.includes('fetch')) {
           errorMessage = "Network error. Please check your connection and try again.";
+        } else if (error.message.includes('validation') || error.message.includes('Invalid')) {
+          errorMessage = "Please check your information and try again.";
         }
       }
       

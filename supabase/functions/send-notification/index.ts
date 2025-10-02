@@ -77,7 +77,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'onboarding@resend.dev', // Using Resend's default domain
+        from: 'Redux Reimagine <noreply@resend.dev>', // Using Resend's default domain
         to: ['mengyishi9@gmail.com'], // Your email address
         subject: subject,
         html: htmlContent,

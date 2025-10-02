@@ -1,0 +1,121 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  try {
+    // Get the Resend API key from environment variables
+    const resendApiKey = Deno.env.get('RESEND_API_KEY')
+    
+    if (!resendApiKey) {
+      throw new Error('RESEND_API_KEY environment variable is not set')
+    }
+
+    // Parse the request body
+    const { name, email, message } = await req.json()
+
+    // Validate required fields
+    if (!name || !email || !message) {
+      throw new Error('Missing required fields: name, email, message')
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email address format')
+    }
+
+    // Create email content
+    const subject = `New Contact Form Submission from ${name}`
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+          <h1 style="margin: 0; font-size: 28px;">New Contact Form Submission</h1>
+          <p style="margin: 10px 0 0 0; opacity: 0.9;">Redux Reimagine Tech Solutions</p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #e9ecef;">
+          <div style="background: white; padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: #333; margin-top: 0; border-bottom: 2px solid #667eea; padding-bottom: 10px;">Contact Details</h2>
+            <p style="margin: 10px 0;"><strong>Name:</strong> ${name}</p>
+            <p style="margin: 10px 0;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #667eea; text-decoration: none;">${email}</a></p>
+            <p style="margin: 10px 0;"><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
+          </div>
+          
+          <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: #333; margin-top: 0; border-bottom: 2px solid #667eea; padding-bottom: 10px;">Message</h2>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 6px; border-left: 4px solid #667eea; white-space: pre-wrap; line-height: 1.6;">${message}</div>
+          </div>
+          
+          <div style="text-align: center; margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 8px;">
+            <p style="margin: 0; color: #1976d2; font-weight: 500;">
+              💡 <strong>Quick Reply:</strong> Click the email address above to reply directly to ${name}
+            </p>
+          </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; color: #666; font-size: 14px;">
+          <p>This message was sent from your website contact form</p>
+          <p>Redux Reimagine Tech Solutions | (213) 787-7893</p>
+        </div>
+      </div>
+    `
+
+    // Send email using Resend
+    const emailResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Redux Reimagine <noreply@resend.dev>', // Using Resend's default domain
+        to: ['mengyishi9@gmail.com'], // Your email address
+        reply_to: email, // Set reply-to to the sender's email
+        subject: subject,
+        html: htmlContent,
+      }),
+    })
+
+    if (!emailResponse.ok) {
+      const errorData = await emailResponse.text()
+      throw new Error(`Failed to send email: ${errorData}`)
+    }
+
+    const emailResult = await emailResponse.json()
+
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        message: 'Contact form submitted successfully',
+        emailId: emailResult.id 
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    )
+
+  } catch (error) {
+    console.error('Error processing contact form:', error)
+    
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        error: error.message 
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      }
+    )
+  }
+})
