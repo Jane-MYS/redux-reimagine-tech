@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import { supabase } from "@/lib/supabase"
 
 const Projects: React.FC = () => {
   const { user } = useAuth()
@@ -284,45 +285,94 @@ const Projects: React.FC = () => {
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
-    if (!files) return
+    if (!files) {
+      console.log('No files selected')
+      return
+    }
+    
+    if (!user) {
+      console.error('No user found')
+      return
+    }
+    
+    if (!selectedProject) {
+      console.error('No project selected')
+      return
+    }
+
+    console.log('Starting file upload...', { 
+      fileCount: files.length, 
+      userId: user.id, 
+      projectId: selectedProject.id 
+    })
 
     setIsUploading(true)
     
-    // Simulate file upload (replace with actual Supabase Storage upload)
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      const uploadedFile = {
-        id: Date.now().toString() + i,
-        name: file.name,
-        type: file.type.split('/')[0],
-        size: (file.size / 1024 / 1024).toFixed(1) + ' MB',
-        url: '#',
-        uploadedAt: new Date().toISOString().split('T')[0]
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        console.log(`Processing file ${i + 1}:`, file.name)
+        
+        // Create structured file path: {user.id}/{projectId}/{timestamp}-{filename}
+        const timestamp = Date.now()
+        const filePath = `${user.id}/${selectedProject.id}/${timestamp}-${file.name}`
+        
+        console.log('Uploading to path:', filePath)
+        
+        // Upload to Supabase Storage
+        const { data, error } = await supabase.storage
+          .from('client-uploads')
+          .upload(filePath, file)
+        
+        if (error) {
+          console.error('Supabase upload error:', error)
+          throw new Error(`Failed to upload ${file.name}: ${error.message}`)
+        }
+        
+        console.log('Upload successful:', data)
+        
+        // Get public URL for the uploaded file
+        const { data: urlData } = supabase.storage
+          .from('client-uploads')
+          .getPublicUrl(filePath)
+        
+        console.log('Public URL:', urlData.publicUrl)
+        
+        const uploadedFile = {
+          id: timestamp.toString() + i,
+          name: file.name,
+          type: file.type.split('/')[0],
+          size: (file.size / 1024 / 1024).toFixed(1) + ' MB',
+          url: urlData.publicUrl,
+          uploadedAt: new Date().toISOString().split('T')[0],
+          path: filePath // Store the file path for reference
+        }
+        
+        setUploadedFiles(prev => [...prev, uploadedFile])
+        
+        // Send email notification for file upload
+        try {
+          await sendFileUploadNotification(
+            selectedProject.title,
+            file.name,
+            uploadedFile.size,
+            uploadedFile.type,
+            selectedProject.id
+          )
+          console.log('File upload notification sent successfully')
+        } catch (error) {
+          console.error('Failed to send file upload notification:', error)
+        }
+        
+        console.log(`File uploaded successfully: ${filePath}`)
       }
-      
-      setUploadedFiles(prev => [...prev, uploadedFile])
-      
-      // Send email notification for file upload
-      try {
-        await sendFileUploadNotification(
-          selectedProject?.title || 'Unknown Project',
-          file.name,
-          uploadedFile.size,
-          uploadedFile.type,
-          selectedProject?.id || 'unknown'
-        )
-        console.log('File upload notification sent successfully')
-      } catch (error) {
-        console.error('Failed to send file upload notification:', error)
-      }
-      
-      // Here you would upload to Supabase Storage
-      // const { data, error } = await supabase.storage
-      //   .from('project-files')
-      //   .upload(`${selectedProject.id}/${file.name}`, file)
+    } catch (error) {
+      console.error('File upload error:', error)
+      // Show user-friendly error message
+      alert(`Upload failed: ${error.message}`)
+    } finally {
+      setIsUploading(false)
     }
-    
-    setIsUploading(false)
   }
 
   const getFileIcon = (type: string) => {
