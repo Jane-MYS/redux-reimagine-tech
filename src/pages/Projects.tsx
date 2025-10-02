@@ -313,16 +313,26 @@ const Projects: React.FC = () => {
         const file = files[i]
         console.log(`Processing file ${i + 1}:`, file.name)
         
-        // Create structured file path: {user.id}/{projectId}/{timestamp}-{filename}
+        // Sanitize filename to remove special characters and spaces
+        const sanitizeFilename = (filename) => {
+          return filename
+            .replace(/[^a-zA-Z0-9.-]/g, '_') // Replace special chars with underscore
+            .replace(/_+/g, '_') // Replace multiple underscores with single
+            .replace(/^_|_$/g, '') // Remove leading/trailing underscores
+            .toLowerCase() // Convert to lowercase for consistency
+        }
+        
+        // Create structured file path: {user.id}/{projectId}/{timestamp}-{sanitizedFilename}
         const timestamp = Date.now()
-        const filePath = `${user.id}/${selectedProject.id}/${timestamp}-${file.name}`
+        const sanitizedFilename = sanitizeFilename(file.name)
+        const filePath = `${user.id}/${selectedProject.id}/${timestamp}-${sanitizedFilename}`
         
         console.log('Uploading to path:', filePath)
         
         // Upload to Supabase Storage
         const { data, error } = await supabase.storage
           .from('client-uploads')
-          .upload(filePath, file)
+          .upload(filePath, file, { upsert: false })
         
         if (error) {
           console.error('Supabase upload error:', error)
