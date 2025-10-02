@@ -15,6 +15,8 @@ import Tickets from "./pages/Tickets";
 import Invoices from "./pages/Invoices";
 import Test from "./pages/Test";
 import AdminTickets from "./pages/AdminTickets";
+import AdminLogin from "./pages/AdminLogin";
+import AdminProtectedRoute from "./components/auth/AdminProtectedRoute";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,7 +37,12 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/tickets" element={<Tickets />} />
-            <Route path="/admin/tickets" element={<AdminTickets />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/tickets" element={
+              <AdminProtectedRoute>
+                <AdminTickets />
+              </AdminProtectedRoute>
+            } />
             <Route path="/invoices" element={<Invoices />} />
             <Route path="/test" element={<Test />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
