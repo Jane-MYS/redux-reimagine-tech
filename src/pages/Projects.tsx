@@ -1,0 +1,329 @@
+import React, { useState, useEffect } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { ArrowLeft, Plus, Calendar, Clock, CheckCircle, AlertCircle, XCircle } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+
+const Projects: React.FC = () => {
+  const { user } = useAuth()
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [newProject, setNewProject] = useState({
+    title: '',
+    description: '',
+    status: 'pending',
+    startDate: '',
+    endDate: ''
+  })
+  const [showValidationWarning, setShowValidationWarning] = useState(false)
+  const [projects, setProjects] = useState([
+    {
+      id: '1',
+      title: 'Website Redesign',
+      description: 'Complete redesign of company website with modern UI/UX',
+      status: 'in_progress' as const,
+      startDate: '2024-01-15',
+      endDate: '2024-03-15',
+      progress: 65,
+      lastUpdated: '2024-01-22'
+    },
+    {
+      id: '2',
+      title: 'Mobile App Development',
+      description: 'iOS and Android app for customer engagement',
+      status: 'pending' as const,
+      startDate: '2024-02-01',
+      endDate: '2024-05-01',
+      progress: 0,
+      lastUpdated: '2024-01-20'
+    },
+    {
+      id: '3',
+      title: 'Database Migration',
+      description: 'Migrate legacy database to cloud infrastructure',
+      status: 'completed' as const,
+      startDate: '2023-12-01',
+      endDate: '2024-01-10',
+      progress: 100,
+      lastUpdated: '2024-01-10'
+    }
+  ])
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle className="w-4 h-4 text-green-600" />
+      case 'in_progress':
+        return <Clock className="w-4 h-4 text-blue-600" />
+      case 'pending':
+        return <AlertCircle className="w-4 h-4 text-yellow-600" />
+      default:
+        return <XCircle className="w-4 h-4 text-gray-600" />
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-green-100 text-green-800 border-green-200'
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200'
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
+  const handleCreateProject = () => {
+    if (newProject.title && newProject.description && newProject.startDate && newProject.endDate) {
+      const project = {
+        id: (projects.length + 1).toString(),
+        title: newProject.title,
+        description: newProject.description,
+        status: newProject.status as 'pending' | 'in_progress' | 'completed',
+        startDate: newProject.startDate,
+        endDate: newProject.endDate,
+        progress: newProject.status === 'completed' ? 100 : newProject.status === 'in_progress' ? 50 : 0,
+        lastUpdated: new Date().toISOString().split('T')[0]
+      }
+      setProjects([project, ...projects])
+      setNewProject({ title: '', description: '', status: 'pending', startDate: '', endDate: '' })
+      setShowValidationWarning(false)
+      setIsCreateDialogOpen(false)
+    } else {
+      setShowValidationWarning(true)
+    }
+  }
+
+  const handleInputChange = (field: string, value: string) => {
+    setNewProject({ ...newProject, [field]: value })
+    if (showValidationWarning) {
+      setShowValidationWarning(false)
+    }
+  }
+
+  return (
+    <ProtectedRoute>
+      <div className="min-h-screen bg-white flex flex-col">
+        <Navbar />
+        
+        <div className="container mx-auto px-6 pt-24 pb-8 flex-1">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Active Projects</h1>
+              <p className="text-gray-600 mt-2">Track and manage your ongoing projects</p>
+            </div>
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary">
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Project
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-white border-gray-200 max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-gray-900">Create New Project</DialogTitle>
+                  <DialogDescription className="text-gray-600">
+                    Add a new project to track and manage your work progress.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-6">
+                  {showValidationWarning && (
+                    <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                      <div className="flex items-center">
+                        <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
+                        <p className="text-red-800 text-sm">
+                          Please fill in all required fields (Title, Description, Start Date, and End Date) to create the project.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="title" className="text-gray-700">Project Title</Label>
+                      <Input
+                        id="title"
+                        value={newProject.title}
+                        onChange={(e) => handleInputChange('title', e.target.value)}
+                        placeholder="Enter project title"
+                        className="bg-white border-gray-300 text-gray-900"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="status" className="text-gray-700">Status</Label>
+                      <Select value={newProject.status} onValueChange={(value) => handleInputChange('status', value)}>
+                        <SelectTrigger className="bg-white border-gray-300">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="in_progress">In Progress</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="description" className="text-gray-700">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={newProject.description}
+                      onChange={(e) => handleInputChange('description', e.target.value)}
+                      placeholder="Describe the project details and objectives"
+                      className="bg-white border-gray-300 text-gray-900"
+                      rows={4}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="startDate" className="text-gray-700">Start Date</Label>
+                      <Input
+                        id="startDate"
+                        type="date"
+                        value={newProject.startDate}
+                        onChange={(e) => handleInputChange('startDate', e.target.value)}
+                        className="bg-white border-gray-300 text-gray-900"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="endDate" className="text-gray-700">End Date</Label>
+                      <Input
+                        id="endDate"
+                        type="date"
+                        value={newProject.endDate}
+                        onChange={(e) => handleInputChange('endDate', e.target.value)}
+                        className="bg-white border-gray-300 text-gray-900"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsCreateDialogOpen(false)}
+                      className="border-gray-300 text-black bg-white hover:bg-white hover:text-black"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleCreateProject}
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    >
+                      Create Project
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {/* Projects Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((project) => (
+              <Card key={project.id} className="bg-white border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg text-gray-900 mb-2">{project.title}</CardTitle>
+                      <CardDescription className="text-gray-600 text-sm">
+                        {project.description}
+                      </CardDescription>
+                    </div>
+                    <Badge className={`${getStatusColor(project.status)} border`}>
+                      <div className="flex items-center space-x-1">
+                        {getStatusIcon(project.status)}
+                        <span className="capitalize">{project.status.replace('_', ' ')}</span>
+                      </div>
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Progress Bar */}
+                    <div>
+                      <div className="flex justify-between text-sm text-gray-600 mb-1">
+                        <span>Progress</span>
+                        <span>{project.progress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-primary h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${project.progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* Dates */}
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <Calendar className="w-4 h-4" />
+                        <span>Start: {formatDate(project.startDate)}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <Calendar className="w-4 h-4" />
+                        <span>End: {formatDate(project.endDate)}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-gray-500">
+                        <Clock className="w-4 h-4" />
+                        <span>Updated: {formatDate(project.lastUpdated)}</span>
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-gray-300 text-black bg-white hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                    >
+                      View Details
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Empty State */}
+          {projects.length === 0 && (
+            <div className="text-center py-12">
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Plus className="w-12 h-12 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No projects yet</h3>
+              <p className="text-gray-600 mb-6">Get started by creating your first project</p>
+              <Button className="bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Project
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <Footer />
+      </div>
+    </ProtectedRoute>
+  )
+}
+
+export default Projects

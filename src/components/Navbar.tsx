@@ -31,13 +31,20 @@ const Navbar = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const navItems = [
-    { label: "Home", id: "home", href: "/" },
-    { label: "About", id: "about", href: "/about" },
-    { label: "Services", id: "services", href: "/" },
-    { label: "Why Us", id: "why-us", href: "/" },
-    { label: "Contact", id: "contact", href: "/" },
-  ];
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup" || location.pathname === "/forgot-password" || location.pathname === "/dashboard";
+  const isPortalPage = location.pathname === "/projects" || location.pathname === "/tickets" || location.pathname === "/invoices";
+  
+  const navItems = isAuthPage 
+    ? [{ label: "Home", id: "home", href: "/" }]
+    : isPortalPage
+    ? [{ label: "Dashboard", id: "dashboard", href: "/dashboard" }]
+    : [
+        { label: "Home", id: "home", href: "/" },
+        { label: "About", id: "about", href: "/about" },
+        { label: "Services", id: "services", href: "/" },
+        { label: "Why Us", id: "why-us", href: "/" },
+        { label: "Contact", id: "contact", href: "/" },
+      ];
 
   return (
     <nav
@@ -58,20 +65,35 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
-              <button
+              <Button
                 key={item.id}
+                variant={isPortalPage ? "outline" : "ghost"}
                 onClick={() => handleNavigation(item)}
-                className="text-foreground/80 hover:text-primary transition-colors font-medium"
+                className={isPortalPage 
+                  ? "border-gray-300 text-black bg-white hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors font-medium"
+                  : "text-black hover:text-black transition-colors font-medium"
+                }
               >
                 {item.label}
-              </button>
+              </Button>
             ))}
-            <Button
-              onClick={() => handleNavigation({ id: "contact", href: "/" })}
-              className="bg-gradient-to-r from-primary to-secondary text-background font-semibold hover:opacity-90 transition-opacity glow-primary"
-            >
-              Book Consultation
-            </Button>
+            {!isAuthPage && !isPortalPage && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/login")}
+                  className="mr-2"
+                >
+                  Client Login
+                </Button>
+                <Button
+                  onClick={() => handleNavigation({ id: "contact", href: "/" })}
+                  className="bg-gradient-to-r from-primary to-secondary text-background font-semibold hover:opacity-90 transition-opacity glow-primary"
+                >
+                  Book Consultation
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -88,20 +110,35 @@ const Navbar = () => {
           <div className="md:hidden py-6 border-t border-border animate-fade-in">
             <div className="flex flex-col gap-4">
               {navItems.map((item) => (
-                <button
+                <Button
                   key={item.id}
+                  variant={isPortalPage ? "outline" : "ghost"}
                   onClick={() => handleNavigation(item)}
-                  className="text-foreground/80 hover:text-primary transition-colors font-medium text-left py-2"
+                  className={isPortalPage 
+                    ? "border-gray-300 text-black bg-white hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors font-medium text-left py-2 justify-start"
+                    : "text-black hover:text-black transition-colors font-medium text-left py-2 justify-start"
+                  }
                 >
                   {item.label}
-                </button>
+                </Button>
               ))}
-              <Button
-                onClick={() => handleNavigation({ id: "contact", href: "/" })}
-                className="bg-gradient-to-r from-primary to-secondary text-background font-semibold mt-2"
-              >
-                Book Consultation
-              </Button>
+              {!isAuthPage && !isPortalPage && (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate("/login")}
+                    className="mt-2"
+                  >
+                    Client Login
+                  </Button>
+                  <Button
+                    onClick={() => handleNavigation({ id: "contact", href: "/" })}
+                    className="bg-gradient-to-r from-primary to-secondary text-background font-semibold mt-2"
+                  >
+                    Book Consultation
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}
