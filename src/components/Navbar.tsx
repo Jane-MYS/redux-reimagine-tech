@@ -82,7 +82,7 @@ const Navbar = () => {
                 <Button
                   variant="outline"
                   onClick={() => navigate("/login")}
-                  className="mr-2"
+                  className="mr-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg hover:shadow-primary/25 transition-all duration-300 font-medium"
                 >
                   Client Login
                 </Button>
@@ -127,7 +127,7 @@ const Navbar = () => {
                   <Button
                     variant="outline"
                     onClick={() => navigate("/login")}
-                    className="mt-2"
+                    className="mt-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg hover:shadow-primary/25 transition-all duration-300 font-medium"
                   >
                     Client Login
                   </Button>
