@@ -13,7 +13,7 @@ const AdminLogin = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { signInWithEmail } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +36,7 @@ const AdminLogin = () => {
       }
 
       // If user is an admin, proceed with login
-      const { error: signInError } = await signInWithEmail(email, password);
+      const { error: signInError } = await signIn(email, password);
       
       if (signInError) {
         setError('Invalid email or password.');
