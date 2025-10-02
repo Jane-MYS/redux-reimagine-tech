@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Eye, EyeOff, Mail, Lock, User, Building, Chrome } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -33,7 +33,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const { signUp, signInWithGoogle } = useAuth()
+  const { signUp } = useAuth()
 
   const {
     register,
@@ -54,19 +54,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
     } else {
       setSuccess(true)
       // Note: Supabase will send a confirmation email
-    }
-
-    setIsLoading(false)
-  }
-
-  const handleGoogleSignIn = async () => {
-    setIsLoading(true)
-    setError(null)
-
-    const { error } = await signInWithGoogle()
-
-    if (error) {
-      setError(error.message)
     }
 
     setIsLoading(false)
@@ -198,30 +185,18 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
           </Button>
         </form>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-gray-300" />
+        <div className="text-center text-sm space-y-2">
+          <div>
+            <span className="text-gray-600">Already have an account? </span>
+            <Link to="/login" className="text-blue-600 hover:underline">
+              Sign in
+            </Link>
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-gray-500">Or continue with</span>
+          <div>
+            <Link to="/forgot-password" className="text-blue-600 hover:underline">
+              Forgot your password?
+            </Link>
           </div>
-        </div>
-
-        <Button
-          variant="outline"
-          className="w-full border-gray-300 text-gray-700 bg-white hover:bg-primary hover:text-primary-foreground hover:border-primary"
-          onClick={handleGoogleSignIn}
-          disabled={isLoading}
-        >
-          <Chrome className="mr-2 h-4 w-4" />
-          Google
-        </Button>
-
-        <div className="text-center text-sm">
-          <span className="text-gray-600">Already have an account? </span>
-          <Link to="/login" className="text-blue-600 hover:underline">
-            Sign in
-          </Link>
         </div>
       </CardContent>
     </Card>
