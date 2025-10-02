@@ -188,7 +188,7 @@ const AdminTickets: React.FC = () => {
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium text-gray-700">Status:</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-40 bg-white text-black border-gray-300">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -204,7 +204,7 @@ const AdminTickets: React.FC = () => {
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium text-gray-700">Priority:</label>
               <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-40 bg-white text-black border-gray-300">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -338,7 +338,7 @@ const AdminTickets: React.FC = () => {
                           value={ticket.status} 
                           onValueChange={(value) => updateTicketStatus(ticket.id, value)}
                         >
-                          <SelectTrigger className="w-32">
+                          <SelectTrigger className="w-32 bg-white text-black border-gray-300">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
