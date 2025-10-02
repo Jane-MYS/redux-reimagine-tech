@@ -71,7 +71,7 @@ const Navbar = () => {
                 onClick={() => handleNavigation(item)}
                 className={isPortalPage 
                   ? "border-gray-300 text-black bg-white hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors font-medium"
-                  : "text-black hover:text-black transition-colors font-medium"
+                  : "text-white hover:text-black hover:bg-primary hover:text-primary-foreground transition-colors font-medium"
                 }
               >
                 {item.label}
@@ -99,7 +99,7 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-foreground"
+            className="md:hidden text-white"
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -116,7 +116,7 @@ const Navbar = () => {
                   onClick={() => handleNavigation(item)}
                   className={isPortalPage 
                     ? "border-gray-300 text-black bg-white hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors font-medium text-left py-2 justify-start"
-                    : "text-black hover:text-black transition-colors font-medium text-left py-2 justify-start"
+                    : "text-white hover:text-black hover:bg-primary hover:text-primary-foreground transition-colors font-medium text-left py-2 justify-start"
                   }
                 >
                   {item.label}
