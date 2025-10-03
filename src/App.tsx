@@ -15,7 +15,6 @@ import Tickets from "./pages/Tickets";
 import Invoices from "./pages/Invoices";
 import Test from "./pages/Test";
 import AdminTickets from "./pages/AdminTickets";
-import AdminLogin from "./pages/AdminLogin";
 import AdminProtectedRoute from "./components/auth/AdminProtectedRoute";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
@@ -40,7 +39,6 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/tickets" element={<Tickets />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={
               <AdminProtectedRoute>
                 <AdminDashboard />

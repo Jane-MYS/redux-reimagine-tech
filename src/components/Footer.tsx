@@ -27,12 +27,6 @@ const Footer = () => {
             <a href="#" className="hover:text-primary transition-colors">
               Twitter
             </a>
-            <Link 
-              to="/admin/login" 
-              className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors font-medium"
-            >
-              Admin Login
-            </Link>
           </div>
         </div>
 
