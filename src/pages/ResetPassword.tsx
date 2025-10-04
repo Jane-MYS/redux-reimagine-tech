@@ -24,21 +24,29 @@ const ResetPassword: React.FC = () => {
   useEffect(() => {
     // Extract tokens from URL hash since we're using hash routing
     const hash = window.location.hash
-    const urlParams = new URLSearchParams(hash.split('?')[1] || '')
+    const fullURL = window.location.href
+    
+    console.log('=== DEBUGGING URL ===')
+    console.log('Full URL:', fullURL)
+    console.log('Hash:', hash)
+    console.log('Hash parts:', hash.split('?'))
+    
+    const hashParams = hash.split('?')[1] || ''
+    console.log('Hash params string:', hashParams)
+    
+    const urlParams = new URLSearchParams(hashParams)
+    console.log('URLSearchParams entries:', Object.fromEntries(urlParams.entries()))
     
     const accessToken = urlParams.get('access_token')
     const refreshToken = urlParams.get('refresh_token')
     const type = urlParams.get('type')
     
-    console.log('Page loaded with URL params:', {
+    console.log('Extracted tokens:', {
       accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : 'null',
       refreshToken: refreshToken ? `${refreshToken.substring(0, 20)}...` : 'null',
-      type,
-      fullURL: window.location.href,
-      hash: window.location.hash,
-      search: window.location.search,
-      extractedFromHash: hash.split('?')[1] || 'no hash params'
+      type
     })
+    console.log('=== END DEBUGGING ===')
     
     if (!accessToken || !refreshToken) {
       setError('Invalid or missing reset token. Please request a new password reset.')
