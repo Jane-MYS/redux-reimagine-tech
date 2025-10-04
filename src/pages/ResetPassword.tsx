@@ -25,6 +25,16 @@ const ResetPassword: React.FC = () => {
     // Check if we have the required tokens
     const accessToken = searchParams.get('access_token')
     const refreshToken = searchParams.get('refresh_token')
+    const type = searchParams.get('type')
+    
+    console.log('Page loaded with URL params:', {
+      accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : 'null',
+      refreshToken: refreshToken ? `${refreshToken.substring(0, 20)}...` : 'null',
+      type,
+      fullURL: window.location.href,
+      hash: window.location.hash,
+      search: window.location.search
+    })
     
     if (!accessToken || !refreshToken) {
       setError('Invalid or missing reset token. Please request a new password reset.')
@@ -54,10 +64,16 @@ const ResetPassword: React.FC = () => {
       const refreshToken = searchParams.get('refresh_token')
       const type = searchParams.get('type')
 
-      console.log('Reset tokens:', { accessToken: !!accessToken, refreshToken: !!refreshToken, type })
+      console.log('Reset tokens:', { 
+        accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : 'null',
+        refreshToken: refreshToken ? `${refreshToken.substring(0, 20)}...` : 'null',
+        type,
+        allParams: Object.fromEntries(searchParams.entries())
+      })
 
       if (!accessToken || !refreshToken) {
-        throw new Error('Invalid reset token')
+        console.error('Missing tokens:', { accessToken: !!accessToken, refreshToken: !!refreshToken })
+        throw new Error('Invalid reset token - missing access_token or refresh_token')
       }
 
       if (type !== 'recovery') {
