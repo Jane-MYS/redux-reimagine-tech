@@ -22,10 +22,13 @@ const ResetPassword: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
 
   useEffect(() => {
-    // Check if we have the required tokens
-    const accessToken = searchParams.get('access_token')
-    const refreshToken = searchParams.get('refresh_token')
-    const type = searchParams.get('type')
+    // Extract tokens from URL hash since we're using hash routing
+    const hash = window.location.hash
+    const urlParams = new URLSearchParams(hash.split('?')[1] || '')
+    
+    const accessToken = urlParams.get('access_token')
+    const refreshToken = urlParams.get('refresh_token')
+    const type = urlParams.get('type')
     
     console.log('Page loaded with URL params:', {
       accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : 'null',
@@ -33,13 +36,14 @@ const ResetPassword: React.FC = () => {
       type,
       fullURL: window.location.href,
       hash: window.location.hash,
-      search: window.location.search
+      search: window.location.search,
+      extractedFromHash: hash.split('?')[1] || 'no hash params'
     })
     
     if (!accessToken || !refreshToken) {
       setError('Invalid or missing reset token. Please request a new password reset.')
     }
-  }, [searchParams])
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,15 +64,20 @@ const ResetPassword: React.FC = () => {
     }
 
     try {
-      const accessToken = searchParams.get('access_token')
-      const refreshToken = searchParams.get('refresh_token')
-      const type = searchParams.get('type')
+      // Extract tokens from URL hash since we're using hash routing
+      const hash = window.location.hash
+      const urlParams = new URLSearchParams(hash.split('?')[1] || '')
+      
+      const accessToken = urlParams.get('access_token')
+      const refreshToken = urlParams.get('refresh_token')
+      const type = urlParams.get('type')
 
       console.log('Reset tokens:', { 
         accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : 'null',
         refreshToken: refreshToken ? `${refreshToken.substring(0, 20)}...` : 'null',
         type,
-        allParams: Object.fromEntries(searchParams.entries())
+        hashParams: hash.split('?')[1] || 'no hash params',
+        allParams: Object.fromEntries(urlParams.entries())
       })
 
       if (!accessToken || !refreshToken) {
