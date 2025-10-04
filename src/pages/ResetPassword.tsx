@@ -29,12 +29,16 @@ const ResetPassword: React.FC = () => {
     console.log('=== DEBUGGING URL ===')
     console.log('Full URL:', fullURL)
     console.log('Hash:', hash)
-    console.log('Hash parts:', hash.split('?'))
     
-    const hashParams = hash.split('?')[1] || ''
-    console.log('Hash params string:', hashParams)
+    // Handle the double hash structure: #/reset-password#access_token=...
+    const hashParts = hash.split('#')
+    console.log('Hash parts split by #:', hashParts)
     
-    const urlParams = new URLSearchParams(hashParams)
+    // The tokens are in the second hash part
+    const tokenPart = hashParts[2] || '' // Index 2 because: ['', '/reset-password', 'access_token=...']
+    console.log('Token part:', tokenPart)
+    
+    const urlParams = new URLSearchParams(tokenPart)
     console.log('URLSearchParams entries:', Object.fromEntries(urlParams.entries()))
     
     const accessToken = urlParams.get('access_token')
@@ -74,7 +78,11 @@ const ResetPassword: React.FC = () => {
     try {
       // Extract tokens from URL hash since we're using hash routing
       const hash = window.location.hash
-      const urlParams = new URLSearchParams(hash.split('?')[1] || '')
+      
+      // Handle the double hash structure: #/reset-password#access_token=...
+      const hashParts = hash.split('#')
+      const tokenPart = hashParts[2] || '' // Index 2 because: ['', '/reset-password', 'access_token=...']
+      const urlParams = new URLSearchParams(tokenPart)
       
       const accessToken = urlParams.get('access_token')
       const refreshToken = urlParams.get('refresh_token')
@@ -84,7 +92,7 @@ const ResetPassword: React.FC = () => {
         accessToken: accessToken ? `${accessToken.substring(0, 20)}...` : 'null',
         refreshToken: refreshToken ? `${refreshToken.substring(0, 20)}...` : 'null',
         type,
-        hashParams: hash.split('?')[1] || 'no hash params',
+        tokenPart,
         allParams: Object.fromEntries(urlParams.entries())
       })
 
