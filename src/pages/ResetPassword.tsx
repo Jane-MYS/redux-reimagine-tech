@@ -52,28 +52,43 @@ const ResetPassword: React.FC = () => {
     try {
       const accessToken = searchParams.get('access_token')
       const refreshToken = searchParams.get('refresh_token')
+      const type = searchParams.get('type')
+
+      console.log('Reset tokens:', { accessToken: !!accessToken, refreshToken: !!refreshToken, type })
 
       if (!accessToken || !refreshToken) {
         throw new Error('Invalid reset token')
       }
 
-      // Set the session using the tokens from the URL
-      const { error: sessionError } = await supabase.auth.setSession({
+      if (type !== 'recovery') {
+        throw new Error('Invalid reset link type')
+      }
+
+      // Set the session first
+      const { data: { session }, error: sessionError } = await supabase.auth.setSession({
         access_token: accessToken,
         refresh_token: refreshToken,
       })
 
+      console.log('Session result:', { session: !!session, error: sessionError })
+
       if (sessionError) {
-        throw sessionError
+        throw new Error(`Invalid reset token: ${sessionError.message}`)
+      }
+
+      if (!session || !session.user) {
+        throw new Error('No valid session found')
       }
 
       // Update the password
-      const { error: updateError } = await supabase.auth.updateUser({
+      const { data, error: updateError } = await supabase.auth.updateUser({
         password: password
       })
 
+      console.log('Update result:', { data, error: updateError })
+
       if (updateError) {
-        throw updateError
+        throw new Error(`Failed to update password: ${updateError.message}`)
       }
 
       setSuccess(true)
