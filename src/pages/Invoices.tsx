@@ -112,7 +112,7 @@ const Invoices: React.FC = () => {
                 </Link>
               </div>
               
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Invoices</h1>
+              <h1 className="text-3xl font-bold text-black mb-2">Invoices</h1>
               <p className="text-gray-600">
                 View and download your invoices
               </p>
@@ -126,7 +126,7 @@ const Invoices: React.FC = () => {
                   placeholder="Search invoices..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-white text-black border-gray-300"
                 />
               </div>
             </div>
@@ -138,10 +138,10 @@ const Invoices: React.FC = () => {
                 <p className="text-gray-600">Loading invoices...</p>
               </div>
             ) : filteredInvoices.length === 0 ? (
-              <Card>
+              <Card className="bg-white border-gray-200">
                 <CardContent className="text-center py-12">
                   <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No invoices found</h3>
+                  <h3 className="text-lg font-medium text-black mb-2">No invoices found</h3>
                   <p className="text-gray-600">
                     {searchTerm ? 'No invoices match your search.' : 'You don\'t have any invoices yet.'}
                   </p>
@@ -150,12 +150,12 @@ const Invoices: React.FC = () => {
             ) : (
               <div className="grid gap-4">
                 {filteredInvoices.map((invoice) => (
-                  <Card key={invoice.id} className="hover:shadow-md transition-shadow">
+                  <Card key={invoice.id} className="bg-white border-gray-200 hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900">
+                            <h3 className="text-lg font-semibold text-black">
                               {invoice.invoice_number}
                             </h3>
                             <Badge className={getStatusColor(invoice.status)}>
@@ -184,7 +184,7 @@ const Invoices: React.FC = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => downloadInvoice(invoice)}
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary"
                           >
                             <Download className="h-4 w-4" />
                             Download
