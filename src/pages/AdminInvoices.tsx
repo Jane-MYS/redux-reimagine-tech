@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Upload, FileText, Download, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { Link } from 'react-router-dom';
 
 interface Invoice {
   id: string;
@@ -106,23 +107,30 @@ const AdminInvoices = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-secondary text-white py-8">
+      <div className="bg-white border-b border-gray-200 py-8">
         <div className="container mx-auto px-6">
-          <h1 className="text-3xl font-bold">Invoice Management</h1>
-          <p className="text-white/90 mt-2">Upload and manage client invoices</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-black">Invoice Management</h1>
+              <p className="text-gray-600 mt-2">Upload and manage client invoices</p>
+            </div>
+            <Button asChild className="bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary">
+              <Link to="/admin/dashboard">Return to Dashboard</Link>
+            </Button>
+          </div>
         </div>
       </div>
 
       <div className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Upload Invoice */}
-          <Card>
+          <Card className="bg-white border-gray-200">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-black">
                 <Upload className="h-5 w-5" />
                 Upload New Invoice
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-600">
                 Upload an invoice for a client
               </CardDescription>
             </CardHeader>
@@ -136,76 +144,81 @@ const AdminInvoices = () => {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="file">Invoice File (PDF)</Label>
-                <Input
-                  id="file"
-                  type="file"
-                  accept=".pdf"
-                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                />
+                <Label htmlFor="file" className="text-black">Invoice File (PDF)</Label>
+                  <Input
+                    id="file"
+                    type="file"
+                    accept=".pdf"
+                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                    className="bg-white text-black border-gray-300"
+                  />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="clientEmail">Client Email</Label>
-                <Input
-                  id="clientEmail"
-                  type="email"
-                  value={clientEmail}
-                  onChange={(e) => setClientEmail(e.target.value)}
-                  placeholder="client@example.com"
-                />
+                <Label htmlFor="clientEmail" className="text-black">Client Email</Label>
+                  <Input
+                    id="clientEmail"
+                    type="email"
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
+                    placeholder="client@example.com"
+                    className="bg-white text-black border-gray-300"
+                  />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="invoiceNumber">Invoice Number</Label>
-                <Input
-                  id="invoiceNumber"
-                  value={invoiceNumber}
-                  onChange={(e) => setInvoiceNumber(e.target.value)}
-                  placeholder="INV-2024-001"
-                />
+                <Label htmlFor="invoiceNumber" className="text-black">Invoice Number</Label>
+                  <Input
+                    id="invoiceNumber"
+                    value={invoiceNumber}
+                    onChange={(e) => setInvoiceNumber(e.target.value)}
+                    placeholder="INV-2024-001"
+                    className="bg-white text-black border-gray-300"
+                  />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="amount">Amount ($)</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="1000.00"
-                />
+                <Label htmlFor="amount" className="text-black">Amount ($)</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="1000.00"
+                    className="bg-white text-black border-gray-300"
+                  />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="dueDate">Due Date</Label>
-                <Input
-                  id="dueDate"
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                />
+                <Label htmlFor="dueDate" className="text-black">Due Date</Label>
+                  <Input
+                    id="dueDate"
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    className="bg-white text-black border-gray-300"
+                  />
               </div>
 
-              <Button 
-                onClick={handleFileUpload} 
-                disabled={isUploading}
-                className="w-full"
-              >
+               <Button 
+                 onClick={handleFileUpload} 
+                 disabled={isUploading}
+                 className="w-full bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary"
+               >
                 {isUploading ? 'Uploading...' : 'Upload Invoice'}
               </Button>
             </CardContent>
           </Card>
 
           {/* Invoice List */}
-          <Card>
+          <Card className="bg-white border-gray-200">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-black">
                 <FileText className="h-5 w-5" />
                 All Invoices
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-600">
                 Manage existing invoices
               </CardDescription>
             </CardHeader>
@@ -214,7 +227,7 @@ const AdminInvoices = () => {
                 {invoices.map((invoice) => (
                   <div key={invoice.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex-1">
-                      <p className="font-medium">{invoice.invoice_number}</p>
+                      <p className="font-medium text-black">{invoice.invoice_number}</p>
                       <p className="text-sm text-gray-600">{invoice.client_email}</p>
                       <p className="text-sm text-gray-600">${invoice.amount}</p>
                       <Badge className={getStatusColor(invoice.status)}>

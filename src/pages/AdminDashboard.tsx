@@ -8,15 +8,15 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-secondary text-white py-8">
+      <div className="bg-white border-b border-gray-200 py-8">
         <div className="container mx-auto px-6">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-white/90 mt-2">Manage your business operations</p>
+          <h1 className="text-3xl font-bold text-black">Admin Dashboard</h1>
+          <p className="text-gray-600 mt-2">Manage your business operations</p>
         </div>
       </div>
 
       {/* Navigation */}
-      <div className="bg-gray-50 border-b">
+      <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-6">
           <nav className="flex space-x-8 py-4">
             <Link 
@@ -27,19 +27,19 @@ const AdminDashboard = () => {
             </Link>
             <Link 
               to="/admin/tickets" 
-              className="text-gray-600 hover:text-primary pb-2 font-medium"
+              className="bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary px-4 py-2 rounded-md transition-colors font-medium"
             >
               Support Tickets
             </Link>
             <Link 
               to="/admin/invoices" 
-              className="text-gray-600 hover:text-primary pb-2 font-medium"
+              className="bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary px-4 py-2 rounded-md transition-colors font-medium"
             >
               Invoice Management
             </Link>
             <Link 
               to="/admin/users" 
-              className="text-gray-600 hover:text-primary pb-2 font-medium"
+              className="bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary px-4 py-2 rounded-md transition-colors font-medium"
             >
               User Management
             </Link>
@@ -63,7 +63,7 @@ const AdminDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild className="w-full mt-4">
+              <Button asChild className="w-full mt-4 bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary">
                 <Link to="/admin/tickets">Manage Tickets</Link>
               </Button>
             </CardContent>
@@ -82,7 +82,7 @@ const AdminDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild className="w-full mt-4">
+              <Button asChild className="w-full mt-4 bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary">
                 <Link to="/admin/invoices">Manage Invoices</Link>
               </Button>
             </CardContent>
@@ -101,7 +101,7 @@ const AdminDashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild className="w-full mt-4">
+              <Button asChild className="w-full mt-4 bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary">
                 <Link to="/admin/users">Manage Users</Link>
               </Button>
             </CardContent>

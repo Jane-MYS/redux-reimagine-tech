@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Plus, Trash2, UserCheck } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { Link } from 'react-router-dom';
 
 interface Admin {
   id: string;
@@ -90,23 +91,30 @@ const AdminUsers = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-secondary text-white py-8">
+      <div className="bg-white border-b border-gray-200 py-8">
         <div className="container mx-auto px-6">
-          <h1 className="text-3xl font-bold">User Management</h1>
-          <p className="text-white/90 mt-2">Manage admin access and user permissions</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-black">User Management</h1>
+              <p className="text-gray-600 mt-2">Manage admin access and user permissions</p>
+            </div>
+            <Button asChild className="bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary">
+              <Link to="/admin/dashboard">Return to Dashboard</Link>
+            </Button>
+          </div>
         </div>
       </div>
 
       <div className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Add New Admin */}
-          <Card>
+          <Card className="bg-white border-gray-200">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-black">
                 <Plus className="h-5 w-5" />
                 Add New Admin
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-600">
                 Grant admin access to a user by adding their email
               </CardDescription>
             </CardHeader>
@@ -120,44 +128,46 @@ const AdminUsers = () => {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={newAdminEmail}
-                  onChange={(e) => setNewAdminEmail(e.target.value)}
-                  placeholder="admin@example.com"
-                />
+                <Label htmlFor="email" className="text-black">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={newAdminEmail}
+                    onChange={(e) => setNewAdminEmail(e.target.value)}
+                    placeholder="admin@example.com"
+                    className="bg-white text-black border-gray-300"
+                  />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  value={newAdminName}
-                  onChange={(e) => setNewAdminName(e.target.value)}
-                  placeholder="Admin User"
-                />
+                <Label htmlFor="name" className="text-black">Full Name</Label>
+                  <Input
+                    id="name"
+                    value={newAdminName}
+                    onChange={(e) => setNewAdminName(e.target.value)}
+                    placeholder="Admin User"
+                    className="bg-white text-black border-gray-300"
+                  />
               </div>
 
-              <Button 
-                onClick={addAdmin} 
-                disabled={isLoading}
-                className="w-full"
-              >
+               <Button 
+                 onClick={addAdmin} 
+                 disabled={isLoading}
+                 className="w-full bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary"
+               >
                 {isLoading ? 'Adding...' : 'Add Admin'}
               </Button>
             </CardContent>
           </Card>
 
           {/* Current Admins */}
-          <Card>
+          <Card className="bg-white border-gray-200">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-black">
                 <UserCheck className="h-5 w-5" />
                 Current Admins
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-gray-600">
                 Manage existing admin users
               </CardDescription>
             </CardHeader>
@@ -166,7 +176,7 @@ const AdminUsers = () => {
                 {admins.map((admin) => (
                   <div key={admin.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div>
-                      <p className="font-medium">{admin.name}</p>
+                      <p className="font-medium text-black">{admin.name}</p>
                       <p className="text-sm text-gray-600">{admin.email}</p>
                       <p className="text-xs text-gray-500">
                         Added: {new Date(admin.created_at).toLocaleDateString()}

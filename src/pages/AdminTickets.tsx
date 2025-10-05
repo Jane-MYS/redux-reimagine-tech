@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { MessageSquare, Clock, CheckCircle, AlertTriangle, XCircle, User, Mail, Calendar } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { Link } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
@@ -179,14 +180,21 @@ const AdminTickets: React.FC = () => {
         <div className="container mx-auto px-6">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard - Support Tickets</h1>
-            <p className="text-gray-600">Manage all support tickets from your clients</p>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-3xl font-bold text-black mb-2">Admin Dashboard - Support Tickets</h1>
+                <p className="text-gray-600">Manage all support tickets from your clients</p>
+              </div>
+              <Button asChild className="bg-white border-gray-300 text-black hover:bg-primary hover:text-primary-foreground hover:border-primary">
+                <Link to="/admin/dashboard">Return to Dashboard</Link>
+              </Button>
+            </div>
           </div>
 
           {/* Filters */}
           <div className="mb-6 flex flex-wrap gap-4">
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Status:</label>
+              <label className="text-sm font-medium text-black">Status:</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-40 bg-white text-black border-gray-300">
                   <SelectValue />
@@ -202,7 +210,7 @@ const AdminTickets: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">Priority:</label>
+              <label className="text-sm font-medium text-black">Priority:</label>
               <Select value={priorityFilter} onValueChange={setPriorityFilter}>
                 <SelectTrigger className="w-40 bg-white text-black border-gray-300">
                   <SelectValue />
@@ -217,33 +225,28 @@ const AdminTickets: React.FC = () => {
               </Select>
             </div>
 
-            <div className="ml-auto">
-              <Button onClick={fetchAllTickets} className="border-gray-300 text-black bg-white hover:bg-primary hover:text-primary-foreground hover:border-primary">
-                Refresh
-              </Button>
-            </div>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <Card>
+            <Card className="bg-white border-gray-200">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Total Tickets</p>
-                    <p className="text-2xl font-bold text-gray-900">{tickets.length}</p>
+                    <p className="text-2xl font-bold text-black">{tickets.length}</p>
                   </div>
                   <MessageSquare className="w-8 h-8 text-gray-400" />
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white border-gray-200">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Open</p>
-                    <p className="text-2xl font-bold text-orange-600">
+                    <p className="text-2xl font-bold text-black">
                       {tickets.filter(t => t.status === 'open').length}
                     </p>
                   </div>
@@ -252,12 +255,12 @@ const AdminTickets: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white border-gray-200">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">In Progress</p>
-                    <p className="text-2xl font-bold text-blue-600">
+                    <p className="text-2xl font-bold text-black">
                       {tickets.filter(t => t.status === 'in_progress').length}
                     </p>
                   </div>
@@ -266,12 +269,12 @@ const AdminTickets: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-white border-gray-200">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-600">Resolved</p>
-                    <p className="text-2xl font-bold text-green-600">
+                    <p className="text-2xl font-bold text-black">
                       {tickets.filter(t => t.status === 'resolved').length}
                     </p>
                   </div>
@@ -284,20 +287,20 @@ const AdminTickets: React.FC = () => {
           {/* Tickets List */}
           <div className="space-y-4">
             {filteredTickets.length === 0 ? (
-              <Card>
+              <Card className="bg-white border-gray-200">
                 <CardContent className="p-8 text-center">
                   <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No tickets found</h3>
+                  <h3 className="text-lg font-medium text-black mb-2">No tickets found</h3>
                   <p className="text-gray-600">No tickets match your current filters.</p>
                 </CardContent>
               </Card>
             ) : (
               filteredTickets.map((ticket) => (
-                <Card key={ticket.id} className="hover:shadow-md transition-shadow">
+                <Card key={ticket.id} className="bg-white border-gray-200 hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <CardTitle className="text-lg mb-2">{ticket.title}</CardTitle>
+                        <CardTitle className="text-lg mb-2 text-black">{ticket.title}</CardTitle>
                         <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
                           <div className="flex items-center gap-1">
                             <User className="w-4 h-4" />
