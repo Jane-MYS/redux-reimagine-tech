@@ -47,7 +47,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
     setIsLoading(true)
     setError(null)
 
-    const { error } = await signUp(data.email, data.password)
+    const { error } = await signUp(data.email, data.password, data.fullName)
 
     if (error) {
       setError(error.message)

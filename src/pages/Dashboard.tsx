@@ -62,8 +62,28 @@ const Dashboard: React.FC = () => {
 
       if (data && !error && data.full_name) {
         setClientName(data.full_name)
+      } else if (error && error.code === 'PGRST116') {
+        // Client doesn't exist, create one with full name from user metadata
+        const fullName = user.user_metadata?.full_name || user.email || 'Client'
+        
+        const { data: newClient, error: createError } = await supabase
+          .from('clients')
+          .insert({
+            user_id: user.id,
+            email: user.email,
+            full_name: fullName
+          })
+          .select('full_name')
+          .single()
+
+        if (newClient && !createError) {
+          setClientName(newClient.full_name)
+        } else {
+          console.log('Error creating client:', createError)
+          setClientName(fullName)
+        }
       } else {
-        // Fallback to user metadata or email
+        // Other error, fallback to user metadata or email
         setClientName(user.user_metadata?.full_name || user.email || 'Client')
       }
     } catch (error) {
