@@ -15,9 +15,11 @@ const Dashboard: React.FC = () => {
   const [isEditingPhone, setIsEditingPhone] = useState(false)
   const [tempPhoneNumber, setTempPhoneNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [clientName, setClientName] = useState('')
 
   useEffect(() => {
     fetchUserPhoneNumber()
+    fetchClientName()
   }, [user])
 
   const fetchUserPhoneNumber = async () => {
@@ -45,6 +47,29 @@ const Dashboard: React.FC = () => {
       }
     } catch (error) {
       console.log('Database operation failed, using localStorage:', error)
+    }
+  }
+
+  const fetchClientName = async () => {
+    if (!user) return
+    
+    try {
+      const { data, error } = await supabase
+        .from('clients')
+        .select('full_name')
+        .eq('user_id', user.id)
+        .single()
+
+      if (data && !error && data.full_name) {
+        setClientName(data.full_name)
+      } else {
+        // Fallback to user metadata or email
+        setClientName(user.user_metadata?.full_name || user.email || 'Client')
+      }
+    } catch (error) {
+      console.log('Error fetching client name:', error)
+      // Fallback to user metadata or email
+      setClientName(user.user_metadata?.full_name || user.email || 'Client')
     }
   }
 
@@ -105,7 +130,9 @@ const Dashboard: React.FC = () => {
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-gray-600">Welcome back to your client portal</p>
+              <p className="text-gray-600">
+                {clientName ? `Hi, ${clientName}! Welcome back to your client portal` : 'Welcome back to your client portal'}
+              </p>
             </div>
             <Button variant="outline" onClick={handleSignOut} className="border-gray-300 text-black bg-white hover:bg-primary hover:text-primary-foreground hover:border-primary">
               <LogOut className="w-4 h-4 mr-2" />
